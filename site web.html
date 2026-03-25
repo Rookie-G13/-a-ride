@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ça ride ? 🏄</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ocean-1:   #4fc3f7;
+      --ocean-2:   #0288d1;
+      --ocean-3:   #01579b;
+      --deep:      #013a63;
+      --coral:     #ff6b6b;
+      --mint:      #43e6c0;
+      --text-dark: #012d4f;
+      --text-mid:  #1a5f8a;
+      --text-soft: #4a90b8;
+      --card-bg:   rgba(255,255,255,0.90);
+      --card-border: rgba(79,195,247,0.35);
+      --sidebar-w: 230px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(160deg, #b3e5fc 0%, #e1f5fe 30%, #e0f7fa 60%, #b2ebf2 100%);
+      min-height: 100vh;
+      color: var(--text-dark);
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(1,88,155,.10) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(79,195,247,.15) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── SIDEBAR ────────────────────────────────────────── */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: linear-gradient(180deg, var(--deep) 0%, var(--ocean-3) 60%, var(--ocean-2) 100%);
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      box-shadow: 4px 0 30px rgba(1,55,100,.25);
+    }
+    #sidebar::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 120px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 230 120'%3E%3Cpath d='M0,60 C40,20 80,100 130,50 C170,10 200,80 230,60 L230,120 L0,120 Z' fill='rgba(79,195,247,0.15)'/%3E%3Cpath d='M0,80 C50,50 90,110 140,70 C180,40 210,90 230,80 L230,120 L0,120 Z' fill='rgba(79,195,247,0.08)'/%3E%3C/svg%3E") no-repeat bottom center / cover;
+      pointer-events: none;
+    }
+
+    .sidebar-logo {
+      padding: 28px 22px 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .wave-deco {
+      font-size: 1.6rem; display: block; margin-bottom: 8px;
+      animation: bob 3s ease-in-out infinite;
+    }
+    @keyframes bob {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
+    }
+    .sidebar-logo h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.55rem; color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,.3);
+    }
+    .sidebar-logo .tagline {
+      font-size: .62rem; color: var(--ocean-1);
+      letter-spacing: .12em; text-transform: uppercase;
+      margin-top: 5px; font-weight: 500;
+    }
+
+    .sidebar-label {
+      font-size: .6rem; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      padding: 18px 22px 8px;
+    }
+
+    nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 22px;
+      color: rgba(255,255,255,.75);
+      font-size: .82rem; font-weight: 500;
+      text-decoration: none; cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .2s;
+    }
+    nav a:hover { color: #fff; background: rgba(255,255,255,.08); }
+    nav a.active { color: #fff; background: rgba(79,195,247,.18); border-left-color: var(--mint); }
+    nav a .icon { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; }
+    .spot-code {
+      background: rgba(67,230,192,.2); border-radius: 20px;
+      font-size: .6rem; font-weight: 700; letter-spacing: .05em;
+      padding: 2px 7px; color: var(--mint); margin-left: auto; flex-shrink: 0;
+    }
+    nav a.active .spot-code { background: rgba(67,230,192,.35); }
+
+    .sidebar-clock {
+      margin-top: auto; padding: 14px 22px 18px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      font-size: .7rem; color: rgba(255,255,255,.4);
+      text-align: center; position: relative; z-index: 1;
+    }
+    #sidebar-time {
+      font-size: 1.1rem; font-weight: 600;
+      color: var(--ocean-1); display: block; margin-bottom: 2px;
+    }
+
+    /* ─── MAIN ───────────────────────────────────────────── */
+    #main {
+      margin-left: var(--sidebar-w);
+      flex: 1; min-height: 100vh;
+      display: flex; flex-direction: column;
+      position: relative; z-index: 1;
+    }
+
+    /* ─── TOPBAR ─────────────────────────────────────────── */
+    .topbar {
+      padding: 0 36px; height: 60px;
+      background: rgba(255,255,255,.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(79,195,247,.3);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-name { font-family: 'Pacifico', cursive; font-size: 1.1rem; color: var(--ocean-3); }
+    .topbar-sep  { color: var(--ocean-1); font-size: 1.1rem; }
+    .topbar-page { font-size: .8rem; font-weight: 600; color: var(--text-mid); letter-spacing: .04em; }
+    .live-pill {
+      background: linear-gradient(135deg, var(--mint) 0%, #2dcea8 100%);
+      color: #fff; font-size: .65rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(43,206,168,.4);
+    }
+
+    /* ─── PAGES ──────────────────────────────────────────── */
+    .page { display: none; padding: 36px 36px 60px; }
+    .page.active { display: block; animation: slideUp .35s cubic-bezier(.4,0,.2,1); }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── SPOT HERO ──────────────────────────────────────── */
+    .spot-hero { margin-bottom: 8px; }
+    .spot-hero h2 {
+      font-family: 'Pacifico', cursive; font-size: 2.1rem;
+      color: var(--ocean-3); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .spot-tag {
+      font-family: 'DM Sans', sans-serif; font-size: .8rem; font-weight: 700;
+      background: var(--ocean-2); color: #fff;
+      padding: 3px 10px; border-radius: 6px; letter-spacing: .06em;
+    }
+    .spot-subtitle { font-size: .8rem; color: var(--text-soft); margin-top: 5px; }
+
+    .wave-sep {
+      width: 100%; height: 32px; margin: 16px 0 28px; opacity: .4; display: block;
+    }
+
+    /* ─── WIDGET GRID ────────────────────────────────────── */
+    .widget-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 22px;
+    }
+    .widget-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      border-radius: 18px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(1,88,155,.10);
+      transition: transform .2s, box-shadow .2s;
+      backdrop-filter: blur(6px);
+    }
+    .widget-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(1,88,155,.18); }
+    .widget-card.full-width { grid-column: 1 / -1; }
+
+    .widget-header {
+      padding: 13px 20px; display: flex; align-items: center; gap: 10px;
+      background: linear-gradient(90deg, rgba(79,195,247,.15) 0%, transparent 80%);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .widget-header .wicon { font-size: 1.1rem; }
+    .widget-header h3 {
+      font-size: .78rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase; color: var(--ocean-3);
+    }
+    .widget-source {
+      margin-left: auto; font-size: .6rem; font-weight: 600;
+      letter-spacing: .07em; text-transform: uppercase; color: var(--text-soft);
+      background: rgba(79,195,247,.15); padding: 3px 8px; border-radius: 10px;
+    }
+
+    .widget-body {
+      padding: 18px; min-height: 100px;
+      overflow-x: auto; /* pour les widgets plus larges que la carte */
+    }
+    .widget-body iframe { max-width: 100%; border: none; display: block; border-radius: 6px; }
+
+    /* Séparateur interne Holfuy */
+    .holfuy-sep {
+      height: 1px; background: rgba(79,195,247,.2);
+      margin: 14px 0;
+    }
+    .holfuy-label {
+      font-size: .64rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+
+    /* SHOM container */
+    .shom-container { min-height: 80px; }
+
+    /* ─── HOME ───────────────────────────────────────────── */
+    .home-hero { text-align: center; padding: 52px 20px 0; }
+    .home-hero h2 {
+      font-family: 'Pacifico', cursive; font-size: 3.2rem;
+      color: var(--ocean-3); line-height: 1.1;
+    }
+    .home-hero h2 .accent { color: var(--coral); }
+    .home-hero p {
+      color: var(--text-mid); font-size: .95rem; margin-top: 12px;
+      max-width: 440px; margin-inline: auto; line-height: 1.7;
+    }
+    .home-wave { width: 100%; margin-top: 24px; opacity: .3; display: block; }
+
+    .spots-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px; margin-top: 32px;
+    }
+    .spot-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 20px; padding: 28px 18px 22px; text-align: center;
+      cursor: pointer; transition: all .25s cubic-bezier(.4,0,.2,1);
+      backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(1,88,155,.08);
+    }
+    .spot-card:hover {
+      transform: translateY(-6px) rotate(-1deg);
+      border-color: var(--ocean-1); box-shadow: 0 14px 30px rgba(1,88,155,.18);
+    }
+    .spot-card .sc-icon { font-size: 2.2rem; margin-bottom: 10px; display: block; }
+    .spot-card h3 { font-family: 'Pacifico', cursive; font-size: .95rem; color: var(--ocean-3); margin-bottom: 5px; }
+    .sc-code {
+      display: inline-block; background: var(--ocean-2); color: #fff;
+      font-size: .6rem; font-weight: 700; letter-spacing: .07em;
+      padding: 2px 8px; border-radius: 10px; margin-bottom: 8px;
+    }
+    .spot-card p { font-size: .72rem; color: var(--text-soft); line-height: 1.5; }
+    .go-btn {
+      display: inline-block; margin-top: 14px;
+      background: linear-gradient(135deg, var(--ocean-1) 0%, var(--ocean-2) 100%);
+      color: #fff; font-size: .7rem; font-weight: 600;
+      padding: 6px 16px; border-radius: 20px; letter-spacing: .04em;
+    }
+
+    .sources-row {
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 38px;
+    }
+    .src-pill {
+      background: rgba(255,255,255,.75); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 6px 16px;
+      font-size: .7rem; font-weight: 600; color: var(--text-mid); backdrop-filter: blur(4px);
+    }
+
+    /* ─── HAMBURGER ──────────────────────────────────────── */
+    #hamburger {
+      display: none; position: fixed; top: 12px; left: 12px; z-index: 200;
+      background: var(--ocean-3); border: none; border-radius: 10px;
+      padding: 9px 12px; cursor: pointer; font-size: 1rem; color: #fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #hamburger { display: block; }
+      #sidebar { transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      #main { margin-left: 0; }
+      .topbar { padding: 0 16px 0 60px; }
+      .page { padding: 24px 16px 48px; }
+      .widget-grid { grid-template-columns: 1fr; }
+      .home-hero h2 { font-size: 2.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<button id="hamburger" onclick="toggleSidebar()">☰</button>
+
+<!-- ═══ SIDEBAR ════════════════════════════════════════════ -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <span class="wave-deco">🏄</span>
+    <h1>Ça ride ?</h1>
+    <div class="tagline">⚓ Bretagne Nord</div>
+  </div>
+
+  <div class="sidebar-label">Navigation</div>
+  <nav>
+    <a class="active" onclick="showPage('home')" id="nav-home">
+      <span class="icon">🌊</span> Accueil
+    </a>
+  </nav>
+
+  <div class="sidebar-label">Spots</div>
+  <nav>
+    <a onclick="showPage('spot1')" id="nav-spot1">
+      <span class="icon">⛵</span> Trébeurden
+      <span class="spot-code">G13</span>
+    </a>
+    <a onclick="showPage('spot2')" id="nav-spot2">
+      <span class="icon">⛵</span> Ile Grande
+      <span class="spot-code">BNIG</span>
+    </a>
+    <a onclick="showPage('spot3')" id="nav-spot3">
+      <span class="icon">⛵</span> Brest
+      <span class="spot-code">ADO</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-clock">
+    <span id="sidebar-time">--:--:--</span>
+    Heure locale
+  </div>
+</aside>
+
+<!-- ═══ MAIN ════════════════════════════════════════════════ -->
+<div id="main">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-name">Ça ride ?</span>
+      <span class="topbar-sep">🌊</span>
+      <span class="topbar-page" id="topbar-page">Accueil</span>
+    </div>
+    <div class="live-pill">⚡ Live</div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       ACCUEIL
+       ════════════════════════════════════════════════════ -->
+  <div class="page active" id="page-home">
+    <div class="home-hero">
+      <h2>Ça <span class="accent">ride</span> ?</h2>
+      <p>Toutes les conditions de navigation en un coup d'œil — vent, marées et anémomètres pour nos spots bretons.</p>
+    </div>
+    <svg class="home-wave" viewBox="0 0 800 50" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,25 C80,5 160,45 240,25 C320,5 400,45 480,25 C560,5 640,45 720,25 C760,15 785,32 800,25 L800,50 L0,50 Z" fill="#0288d1"/>
+      <path d="M0,35 C100,15 200,50 300,32 C400,14 500,50 600,35 C700,18 760,42 800,35 L800,50 L0,50 Z" fill="#4fc3f7" opacity=".6"/>
+    </svg>
+    <div class="spots-grid">
+      <div class="spot-card" onclick="showPage('spot1')">
+        <span class="sc-icon">⚓</span>
+        <div class="sc-code">G13</div>
+        <h3>Trébeurden</h3>
+        <p>Côtes d'Armor<br/>Vent · Marées · Live</p>
+        <div class="go-btn">Voir les conditions →</div>
+      </div>
+      <div class="spot-card" onclick="showPage('spot2')">
+        <span class="sc-icon">🏝️</span>
+        <div class="sc-code">BNIG</div>
+        <h3>Ile Grande</h3>
+        <p>Pleumeur-Bodou<br/>Vent · Marées · Live</p>
+        <div class="go-btn">Voir les conditions →</div>
+      </div>
+      <div class="spot-card" onclick="showPage('spot3')">
+        <span class="sc-icon">🛥️</span>
+        <div class="sc-code">ADO</div>
+        <h3>Brest</h3>
+        <p>L'Adonnante<br/>Vent · Marées · Live</p>
+        <div class="go-btn">Voir les conditions →</div>
+      </div>
+    </div>
+    <div class="sources-row">
+      <div class="src-pill"><span>💨</span> Windguru</div>
+      <div class="src-pill"><span>📡</span> Holfuy</div>
+      <div class="src-pill"><span>🌊</span> SHOM / Marée</div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SPOT 1 — TRÉBEURDEN G13
+       ════════════════════════════════════════════════════ -->
+  <div class="page" id="page-spot1">
+    <div class="spot-hero">
+      <h2>Trébeurden <span class="spot-tag">G13</span></h2>
+      <p class="spot-subtitle">⚓ Côtes d'Armor · 22560</p>
+    </div>
+    <svg class="wave-sep" viewBox="0 0 600 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,16 C60,2 120,30 180,16 C240,2 300,30 360,16 C420,2 480,30 540,16 C565,9 582,22 600,16 L600,32 L0,32 Z" fill="#4fc3f7"/>
+    </svg>
+
+    <div class="widget-grid">
+
+      <!-- WINDGURU — Trébeurden G13 -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="wicon">💨</span>
+          <h3>Prévisions Vent</h3>
+          <span class="widget-source">Windguru</span>
+        </div>
+        <div class="widget-body">
+          <script id="wg_fwdg_48427_101_1774425163091">
+          (function (window, document) {
+            var loader = function () {
+              var arg = ["s=48427","m=101","uid=wg_fwdg_48427_101_1774425163091","wj=knots","tj=c","waj=m","tij=cm","odh=0","doh=24","fhours=240","hrsm=1","vt=forecasts","lng=fr","p=WINDSPD,GUST,MWINDSPD,SMER,TMP,TCDC,APCP1s"];
+              var script = document.createElement("script");
+              var tag = document.getElementsByTagName("script")[0];
+              script.src = "https://www.windguru.cz/js/widget.php?"+(arg.join("&"));
+              tag.parentNode.insertBefore(script, tag);
+            };
+            window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+          })(window, document);
+          </script>
+        </div>
+      </div>
+
+      <!-- HOLFUY — Trébeurden G13 -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="wicon">📡</span>
+          <h3>Vent en Direct</h3>
+          <span class="widget-source">Holfuy · Station 787</span>
+        </div>
+        <div class="widget-body">
+          <p class="holfuy-label">🔴 Maintenant</p>
+          <iframe frameborder="0" marginheight="1" marginwidth="1" scrolling="no"
+            src="https://widget.holfuy.com/?station=787&su=knots&t=C&lang=fr&mode=detailed"
+            style="width:100%; height:250px;"></iframe>
+          <div class="holfuy-sep"></div>
+          <p class="holfuy-label">📊 Historique</p>
+          <iframe frameborder="0" marginheight="1" marginwidth="1" scrolling="no"
+            src="https://widget.holfuy.com/?station=787&su=knots&t=C&lang=fr&mode=average&avgrows=32"
+            style="width:100%; height:170px;"></iframe>
+        </div>
+      </div>
+
+      <!-- MARÉE — Trébeurden -->
+      <div class="widget-card full-width">
+        <div class="widget-header">
+          <span class="wicon">🌊</span>
+          <h3>Marées</h3>
+          <span class="widget-source">SHOM</span>
+        </div>
+        <div class="widget-body">
+          <div class="shom-container">
+            <script src="https://services.data.shom.fr/hdm/vignette/grande/TREBEURDEN?locale=fr"></script>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /spot1 -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SPOT 2 — ILE GRANDE BNIG
+       ════════════════════════════════════════════════════ -->
+  <div class="page" id="page-spot2">
+    <div class="spot-hero">
+      <h2>Ile Grande <span class="spot-tag">BNIG</span></h2>
+      <p class="spot-subtitle">🏝️ Pleumeur-Bodou · Côtes d'Armor</p>
+    </div>
+    <svg class="wave-sep" viewBox="0 0 600 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,16 C60,2 120,30 180,16 C240,2 300,30 360,16 C420,2 480,30 540,16 C565,9 582,22 600,16 L600,32 L0,32 Z" fill="#4fc3f7"/>
+    </svg>
+
+    <div class="widget-grid">
+
+      <!-- WINDGURU — Ile Grande BNIG -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="wicon">💨</span>
+          <h3>Prévisions Vent</h3>
+          <span class="widget-source">Windguru</span>
+        </div>
+        <div class="widget-body">
+          <script id="wg_fwdg_1275025_101_1774425353357">
+          (function (window, document) {
+            var loader = function () {
+              var arg = ["s=1275025","m=101","uid=wg_fwdg_1275025_101_1774425353357","ai=0","wj=knots","tj=c","waj=m","tij=cm","odh=0","doh=24","fhours=240","hrsm=2","vt=forecasts","lng=fr","p=WINDSPD,GUST,SMER,TMP,TCDC,APCP1s"];
+              var script = document.createElement("script");
+              var tag = document.getElementsByTagName("script")[0];
+              script.src = "https://www.windguru.cz/js/widget.php?"+(arg.join("&"));
+              tag.parentNode.insertBefore(script, tag);
+            };
+            window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+          })(window, document);
+          </script>
+        </div>
+      </div>
+
+      <!-- HOLFUY — Ile Grande BNIG -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="wicon">📡</span>
+          <h3>Vent en Direct</h3>
+          <span class="widget-source">Holfuy · Station 809</span>
+        </div>
+        <div class="widget-body">
+          <p class="holfuy-label">🔴 Maintenant</p>
+          <iframe frameborder="0" marginheight="1" marginwidth="1" scrolling="no"
+            src="https://widget.holfuy.com/?station=809&su=knots&t=C&lang=fr&mode=detailed"
+            style="width:100%; height:250px;"></iframe>
+          <div class="holfuy-sep"></div>
+          <p class="holfuy-label">📊 Historique</p>
+          <iframe frameborder="0" marginheight="1" marginwidth="1" scrolling="no"
+            src="https://widget.holfuy.com/?station=809&su=knots&t=C&lang=fr&mode=average&avgrows=32"
+            style="width:100%; height:170px;"></iframe>
+        </div>
+      </div>
+
+      <!-- MARÉE — Ile Grande (⚠️ même code SHOM que Trébeurden — à vérifier) -->
+      <div class="widget-card full-width">
+        <div class="widget-header">
+          <span class="wicon">🌊</span>
+          <h3>Marées</h3>
+          <span class="widget-source">SHOM</span>
+        </div>
+        <div class="widget-body">
+          <div class="shom-container">
+            <script src="https://services.data.shom.fr/hdm/vignette/grande/TREBEURDEN?locale=fr"></script>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /spot2 -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SPOT 3 — BREST L'ADONNANTE
+       ════════════════════════════════════════════════════ -->
+  <div class="page" id="page-spot3">
+    <div class="spot-hero">
+      <h2>Brest <span class="spot-tag">ADO</span></h2>
+      <p class="spot-subtitle">🛥️ L'Adonnante · Finistère · 29200</p>
+    </div>
+    <svg class="wave-sep" viewBox="0 0 600 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,16 C60,2 120,30 180,16 C240,2 300,30 360,16 C420,2 480,30 540,16 C565,9 582,22 600,16 L600,32 L0,32 Z" fill="#4fc3f7"/>
+    </svg>
+
+    <div class="widget-grid">
+
+      <!-- WINDGURU — Brest L'Adonnante -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="wicon">💨</span>
+          <h3>Prévisions Vent</h3>
+          <span class="widget-source">Windguru</span>
+        </div>
+        <div class="widget-body">
+          <script id="wg_fwdg_48447_101_1774425392836">
+          (function (window, document) {
+            var loader = function () {
+              var arg = ["s=48447","m=101","uid=wg_fwdg_48447_101_1774425392836","wj=knots","tj=c","waj=m","tij=cm","odh=0","doh=24","fhours=240","hrsm=2","vt=forecasts","lng=fr","p=WINDSPD,GUST,SMER,TMP,TCDC,APCP1s"];
+              var script = document.createElement("script");
+              var tag = document.getElementsByTagName("script")[0];
+              script.src = "https://www.windguru.cz/js/widget.php?"+(arg.join("&"));
+              tag.parentNode.insertBefore(script, tag);
+            };
+            window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+          })(window, document);
+          </script>
+        </div>
+      </div>
+
+      <!-- HOLFUY — Brest L'Adonnante -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="wicon">📡</span>
+          <h3>Vent en Direct</h3>
+          <span class="widget-source">Holfuy · Station 1641</span>
+        </div>
+        <div class="widget-body">
+          <p class="holfuy-label">🔴 Maintenant</p>
+          <iframe frameborder="0" marginheight="1" marginwidth="1" scrolling="no"
+            src="https://widget.holfuy.com/?station=1641&su=knots&t=C&lang=fr&mode=detailed"
+            style="width:100%; height:250px;"></iframe>
+          <div class="holfuy-sep"></div>
+          <p class="holfuy-label">📊 Historique</p>
+          <iframe frameborder="0" marginheight="1" marginwidth="1" scrolling="no"
+            src="https://widget.holfuy.com/?station=1641&su=knots&t=C&lang=fr&mode=average&avgrows=32"
+            style="width:100%; height:170px;"></iframe>
+        </div>
+      </div>
+
+      <!-- MARÉE — Brest -->
+      <div class="widget-card full-width">
+        <div class="widget-header">
+          <span class="wicon">🌊</span>
+          <h3>Marées</h3>
+          <span class="widget-source">SHOM</span>
+        </div>
+        <div class="widget-body">
+          <div class="shom-container">
+            <script src="https://services.data.shom.fr/hdm/vignette/grande/BREST?locale=fr"></script>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /spot3 -->
+
+</div><!-- /main -->
+
+<script>
+  // Horloge
+  function tick() {
+    document.getElementById('sidebar-time').textContent =
+      new Date().toLocaleTimeString('fr-FR');
+  }
+  setInterval(tick, 1000); tick();
+
+  // Labels topbar
+  const labels = {
+    home:  'Accueil',
+    spot1: 'Trébeurden — G13',
+    spot2: 'Ile Grande — BNIG',
+    spot3: "Brest — L'Adonnante"
+  };
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    const nav = document.getElementById('nav-' + id);
+    if (nav) nav.classList.add('active');
+    document.getElementById('topbar-page').textContent = labels[id] || '';
+    document.getElementById('sidebar').classList.remove('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  document.addEventListener('click', e => {
+    const sb = document.getElementById('sidebar');
+    const hb = document.getElementById('hamburger');
+    if (window.innerWidth <= 768 && sb.classList.contains('open') &&
+        !sb.contains(e.target) && !hb.contains(e.target)) {
+      sb.classList.remove('open');
+    }
+  });
+</script>
+
+</body>
+</html>
